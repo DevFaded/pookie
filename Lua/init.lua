@@ -19,3 +19,10 @@ getgenv().getcallingscript = function()
     end
     return nil
 end
+
+getgenv().compareinstances = function(object1, object2)
+    if not (typeof(object1) == "Instance" and typeof(object2) == "Instance") then
+        return false
+    end
+    return object1:GetDebugId() == object2:GetDebugId()
+end
