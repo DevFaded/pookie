@@ -6,4 +6,4 @@ getgenv().getexecutorname = function()
     return "ParadiseWRD"
 end
 
-print("Environment Loaded! | discord.gg/getparadise
+print("Environment Loaded! | discord.gg/getparadise")
