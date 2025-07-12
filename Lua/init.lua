@@ -1,9 +1,13 @@
-getgenv().identifyexecutor = function()
+getgenv().getexecutorname = function()
     return "ParadiseWRD"
 end
 
-getgenv().getexecutorname = function()
-    return "ParadiseWRD"
+getgenv().getexecutorversion = function()
+    return "1.0"
+end
+
+getgenv().identifyexecutor = function()
+    return getexecutorname(), getexecutorversion()
 end
 
 getgenv().getcallingscript = function()
