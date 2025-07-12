@@ -19,5 +19,3 @@ getgenv().getcallingscript = function()
     end
     return nil
 end
-
-print("Environment Loaded! | discord.gg/getparadise")
