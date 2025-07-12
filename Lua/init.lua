@@ -27,9 +27,14 @@ getgenv().compareinstances = function(object1, object2)
     return object1:GetDebugId() == object2:GetDebugId()
 end
 
+getgenv().firetouchtransmitter = function(part1, part2)
+    firetouchinterest(part1, part2, 0)
+    task.wait(0.05)
+    firetouchinterest(part1, part2, 1)
+end
+
 getgenv().isluaclosure = function(fn)
     if typeof(fn) ~= "function" then return false end
     local info = debug.getinfo(fn)
     return info and info.what == "Lua"
 end
-
