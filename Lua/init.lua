@@ -26,3 +26,10 @@ getgenv().compareinstances = function(object1, object2)
     end
     return object1:GetDebugId() == object2:GetDebugId()
 end
+
+getgenv().isluaclosure = function(fn)
+    if typeof(fn) ~= "function" then return false end
+    local info = debug.getinfo(fn)
+    return info and info.what == "Lua"
+end
+
