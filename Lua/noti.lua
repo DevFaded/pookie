@@ -191,5 +191,7 @@ return function()
     end
 
     -- Return the notification function for use
-    return CreateNotification
+    return {
+    CreateNotification = CreateNotification
+}
 end
