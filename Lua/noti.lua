@@ -1,51 +1,49 @@
-return function()
-	local NotificationLib = {}
+return {
+	CreateNotification = function(Options)
+		local NotifUI = Instance.new("ScreenGui")
+		local Holder = Instance.new("ScrollingFrame")
+		local Buttons = Instance.new("Frame")
+		local UICorner_3 = Instance.new("UICorner")
+		local TextLabel_3 = Instance.new("TextLabel")
+		local TextLabel_4 = Instance.new("TextLabel")
+		local TextButton_2 = Instance.new("TextButton")
+		local UICorner_4 = Instance.new("UICorner")
+		local TextButton_3 = Instance.new("TextButton")
+		local UICorner_5 = Instance.new("UICorner")
+		local Sorter = Instance.new("UIListLayout")
 
-	local NotifUI = Instance.new("ScreenGui")
-	local Holder = Instance.new("ScrollingFrame")
-	local Buttons = Instance.new("Frame")
-	local UICorner_3 = Instance.new("UICorner")
-	local TextLabel_3 = Instance.new("TextLabel")
-	local TextLabel_4 = Instance.new("TextLabel")
-	local TextButton_2 = Instance.new("TextButton")
-	local UICorner_4 = Instance.new("UICorner")
-	local TextButton_3 = Instance.new("TextButton")
-	local UICorner_5 = Instance.new("UICorner")
-	local Sorter = Instance.new("UIListLayout")
+		NotifUI.Name = "NotifUI"
+		NotifUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+		NotifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-	NotifUI.Name = "NotifUI"
-	NotifUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-	NotifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		Holder.Name = "Holder"
+		Holder.Parent = NotifUI
+		Holder.Active = true
+		Holder.AnchorPoint = Vector2.new(1, 0)
+		Holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Holder.BackgroundTransparency = 1.000
+		Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Holder.BorderSizePixel = 0
+		Holder.Position = UDim2.new(1, 0, 0.1, 0)
+		Holder.Size = UDim2.new(0.25, 0, 1, 0)
+		Holder.CanvasSize = UDim2.new(0, 0, 0, 0)
 
-	Holder.Name = "Holder"
-	Holder.Parent = NotifUI
-	Holder.Active = true
-	Holder.AnchorPoint = Vector2.new(1, 0)
-	Holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Holder.BackgroundTransparency = 1.000
-	Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Holder.BorderSizePixel = 0
-	Holder.Position = UDim2.new(1, 0, 0.1, 0)
-	Holder.Size = UDim2.new(0.25, 0, 1, 0)
-	Holder.CanvasSize = UDim2.new(0, 0, 0, 0)
+		Sorter.Name = "Sorter"
+		Sorter.Parent = Holder
+		Sorter.HorizontalAlignment = Enum.HorizontalAlignment.Center
+		Sorter.SortOrder = Enum.SortOrder.LayoutOrder
+		Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
+		Sorter.Padding = UDim.new(0, 15)
 
-	Sorter.Name = "Sorter"
-	Sorter.Parent = Holder
-	Sorter.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	Sorter.SortOrder = Enum.SortOrder.LayoutOrder
-	Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
-	Sorter.Padding = UDim.new(0, 15)
-
-	local function SetDefault(v1, v2)
-		v1 = v1 or {}
-		local v3 = {}
-		for i, v in next, v2 do
-			v3[i] = v1[i] or v2[i]
+		local function SetDefault(v1, v2)
+			v1 = v1 or {}
+			local v3 = {}
+			for i, v in next, v2 do
+				v3[i] = v1[i] or v2[i]
+			end
+			return v3
 		end
-		return v3
-	end
 
-	function NotificationLib:CreateNotification(Options)
 		local Default = {
 			Buttons = {
 				[1] = {
@@ -171,6 +169,4 @@ return function()
 			end)
 		end
 	end
-
-	return NotificationLib
-end
+}
