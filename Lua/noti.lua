@@ -25,33 +25,20 @@ return function()
     Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
     Sorter.Padding = UDim.new(0, 15)
 
-    local function DeepMerge(defaults, options)
-    local result = {}
-    for k, v in pairs(defaults) do
-        if type(v) == "table" then
-            if type(options[k]) == "table" then
-                result[k] = DeepMerge(v, options[k])
+    local function DeepMerge(t1, t2)
+        if type(t1) ~= "table" then
+            return t2
+        end
+        local result = {}
+        for k, v in pairs(t2) do
+            if type(v) == "table" then
+                result[k] = DeepMerge(t1[k], v)
             else
-                result[k] = v
-            end
-        else
-            if options[k] ~= nil then
-                result[k] = options[k]
-            else
-                result[k] = v
+                result[k] = t1[k] ~= nil and t1[k] or v
             end
         end
+        return result
     end
-
-    -- also add keys that are only in options but not in defaults
-    for k, v in pairs(options) do
-        if result[k] == nil then
-            result[k] = v
-        end
-    end
-    return result
-end
-
 
     local function CreateNotification(Options)
         local Default = {
@@ -68,7 +55,7 @@ end
             NeverExpire = false
         }
 
-        Options = DeepMerge(Default, Options or {})
+        Options = DeepMerge(Options or {}, Default)
 
         local TweenService = game:GetService("TweenService")
 
