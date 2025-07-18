@@ -1,171 +1,154 @@
 return {
 	CreateNotification = function(Options)
-		local NotifUI = Instance.new("ScreenGui")
-		local Holder = Instance.new("ScrollingFrame")
-		local Buttons = Instance.new("Frame")
-		local UICorner_3 = Instance.new("UICorner")
-		local TextLabel_3 = Instance.new("TextLabel")
-		local TextLabel_4 = Instance.new("TextLabel")
-		local TextButton_2 = Instance.new("TextButton")
-		local UICorner_4 = Instance.new("UICorner")
-		local TextButton_3 = Instance.new("TextButton")
-		local UICorner_5 = Instance.new("UICorner")
-		local Sorter = Instance.new("UIListLayout")
+		local TweenService = game:GetService("TweenService")
 
+		local NotifUI = Instance.new("ScreenGui")
 		NotifUI.Name = "NotifUI"
 		NotifUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 		NotifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+		local Holder = Instance.new("Frame")
 		Holder.Name = "Holder"
 		Holder.Parent = NotifUI
-		Holder.Active = true
-		Holder.AnchorPoint = Vector2.new(1, 0)
-		Holder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		Holder.BackgroundTransparency = 1.000
-		Holder.BorderColor3 = Color3.fromRGB(0, 0, 0)
-		Holder.BorderSizePixel = 0
-		Holder.Position = UDim2.new(1, 0, 0.1, 0)
-		Holder.Size = UDim2.new(0.25, 0, 1, 0)
-		Holder.CanvasSize = UDim2.new(0, 0, 0, 0)
+		Holder.AnchorPoint = Vector2.new(0.5, 0)
+		Holder.Position = UDim2.new(0.5, 0, 0.1, 0)
+		Holder.BackgroundTransparency = 1
+		Holder.Size = UDim2.new(0, 280, 0, 150)
 
-		Sorter.Name = "Sorter"
-		Sorter.Parent = Holder
-		Sorter.HorizontalAlignment = Enum.HorizontalAlignment.Center
-		Sorter.SortOrder = Enum.SortOrder.LayoutOrder
-		Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
-		Sorter.Padding = UDim.new(0, 15)
+		local Notification = Instance.new("Frame")
+		Notification.Name = "Notification"
+		Notification.Parent = Holder
+		Notification.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		Notification.Size = UDim2.new(1, 0, 1, 0)
+		Notification.AnchorPoint = Vector2.new(0.5, 0)
+		Notification.Position = UDim2.new(0.5, 0, 0, 0)
+		Notification.BackgroundTransparency = 1
+		Notification.ClipsDescendants = true
+		Notification.AutoButtonColor = false
+		Notification.BorderSizePixel = 0
+		Notification.UICorner = Instance.new("UICorner", Notification)
+		Notification.UICorner.CornerRadius = UDim.new(0, 10)
 
-		local function SetDefault(v1, v2)
-			v1 = v1 or {}
-			local v3 = {}
-			for i, v in next, v2 do
-				v3[i] = v1[i] or v2[i]
-			end
-			return v3
+		local Title = Instance.new("TextLabel")
+		Title.Parent = Notification
+		Title.BackgroundTransparency = 1
+		Title.Position = UDim2.new(0, 12, 0, 12)
+		Title.Size = UDim2.new(1, -24, 0, 26)
+		Title.Font = Enum.Font.GothamBold
+		Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Title.TextSize = 18
+		Title.TextXAlignment = Enum.TextXAlignment.Left
+		Title.Text = Options.Title or "Notification Title"
+
+		local Content = Instance.new("TextLabel")
+		Content.Parent = Notification
+		Content.BackgroundTransparency = 1
+		Content.Position = UDim2.new(0, 12, 0, 42)
+		Content.Size = UDim2.new(1, -24, 0, 70)
+		Content.Font = Enum.Font.Gotham
+		Content.TextColor3 = Color3.fromRGB(220, 220, 220)
+		Content.TextSize = 14
+		Content.TextWrapped = true
+		Content.TextXAlignment = Enum.TextXAlignment.Left
+		Content.TextYAlignment = Enum.TextYAlignment.Top
+		Content.Text = Options.Content or "Notification content here."
+
+		local ButtonsFrame = Instance.new("Frame")
+		ButtonsFrame.Parent = Notification
+		ButtonsFrame.BackgroundTransparency = 1
+		ButtonsFrame.Position = UDim2.new(0, 12, 1, -44)
+		ButtonsFrame.Size = UDim2.new(1, -24, 0, 32)
+
+		local UIListLayout = Instance.new("UIListLayout")
+		UIListLayout.FillDirection = Enum.FillDirection.Horizontal
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout.Padding = UDim.new(0, 10)
+		UIListLayout.Parent = ButtonsFrame
+
+		local Buttons = Options.Buttons
+		if not Buttons or #Buttons == 0 then
+			Buttons = {
+				{
+					Title = "Dismiss",
+					ClosesUI = true,
+					Callback = function() end,
+				}
+			}
 		end
 
-		local Default = {
-			Buttons = {
-				[1] = {
-					Title = 'Dismiss',
-					ClosesUI = true,
-					Callback = function() end
-				}
-			},
-			Title = 'Notification Title',
-			Content = 'Placeholder notification content',
-			Length = 5,
-			NeverExpire = false
-		}
-		Options = SetDefault(Options, Default)
+		for i, btnData in ipairs(Buttons) do
+			local btn = Instance.new("TextButton")
+			btn.Parent = ButtonsFrame
+			btn.AutoButtonColor = true
+			btn.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+			btn.TextColor3 = Color3.fromRGB(15, 15, 15)
+			btn.Font = Enum.Font.GothamSemibold
+			btn.TextSize = 14
+			btn.Text = btnData.Title or "Button"
+			btn.Size = UDim2.new(0, 0, 1, 0)
+			btn.ClipsDescendants = true
+			btn.AnchorPoint = Vector2.new(0, 0)
+			btn.BorderSizePixel = 0
 
-		local Dismiss = Instance.new("Frame")
-		local UICorner = Instance.new("UICorner")
-		local TextLabel = Instance.new("TextLabel")
-		local TextLabel_2 = Instance.new("TextLabel")
-		local TextButton = Instance.new("TextButton")
-		local UICorner_2 = Instance.new("UICorner")
-		local TweenService = game:GetService("TweenService")
+			local UICorner = Instance.new("UICorner")
+			UICorner.CornerRadius = UDim.new(0, 6)
+			UICorner.Parent = btn
 
-		Dismiss.Name = "Notification"
-		Dismiss.Parent = Holder
-		Dismiss.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-		Dismiss.BackgroundTransparency = 1
-		Dismiss.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		Dismiss.Size = UDim2.new(0, 262, 0, 132)
-		Dismiss.Position = UDim2.new(0, 0, 0, 0)
-		Dismiss.Visible = true
+			task.defer(function()
+				local textSize = btn.TextBounds
+				btn.Size = UDim2.new(0, textSize.X + 20, 1, 0)
+			end)
 
-		UICorner.Parent = Dismiss
-
-		TextLabel.Parent = Dismiss
-		TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		TextLabel.BackgroundTransparency = 1.000
-		TextLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		TextLabel.Position = UDim2.new(0.057, 0, 0.053, 0)
-		TextLabel.Size = UDim2.new(0, 194, 0, 29)
-		TextLabel.Font = Enum.Font.GothamMedium
-		TextLabel.Text = Options.Title
-		TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-		TextLabel.TextSize = 16.000
-		TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-		TextLabel.TextTransparency = 1
-
-		TextLabel_2.Parent = Dismiss
-		TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-		TextLabel_2.BackgroundTransparency = 1.000
-		TextLabel_2.BorderColor3 = Color3.fromRGB(27, 42, 53)
-		TextLabel_2.Position = UDim2.new(0.057, 0, 0.303, 0)
-		TextLabel_2.Size = UDim2.new(0, 233, 0, 52)
-		TextLabel_2.Font = Enum.Font.Gotham
-		TextLabel_2.Text = Options.Content
-		TextLabel_2.TextColor3 = Color3.fromRGB(234, 234, 234)
-		TextLabel_2.TextSize = 14.000
-		TextLabel_2.TextWrapped = true
-		TextLabel_2.TextXAlignment = Enum.TextXAlignment.Left
-		TextLabel_2.TextYAlignment = Enum.TextYAlignment.Top
-		TextLabel_2.TextTransparency = 1
-
-		if Options.Buttons[1] then
-			TextButton.Parent = Dismiss
-			TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-			TextButton.BorderColor3 = Color3.fromRGB(27, 42, 53)
-			TextButton.Position = UDim2.new(0.057, 0, 0.697, 0)
-			TextButton.Size = UDim2.new(0, 233, 0, 29)
-			TextButton.Font = Enum.Font.GothamMedium
-			TextButton.Text = Options.Buttons[1].Title or "Dismiss"
-			TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-			TextButton.TextSize = 16.000
-			TextButton.TextStrokeColor3 = Color3.fromRGB(31, 33, 35)
-			TextButton.TextTransparency = 1
-			UICorner_2.CornerRadius = UDim.new(0, 6)
-			UICorner_2.Parent = TextButton
-			TextButton.MouseButton1Click:Connect(function()
-				if Options.Buttons[1].Callback then
-					task.spawn(Options.Buttons[1].Callback)
+			btn.MouseButton1Click:Connect(function()
+				if btnData.Callback then
+					task.spawn(btnData.Callback)
 				end
-				if Options.Buttons[1].ClosesUI then
-					TweenService:Create(Dismiss, TweenInfo.new(0.3), {
+				if btnData.ClosesUI then
+					TweenService:Create(Notification, TweenInfo.new(0.25), {
 						BackgroundTransparency = 1,
-						Position = Dismiss.Position + UDim2.new(0.1, 0, 0, 20)
+						Position = Notification.Position + UDim2.new(0, 0, 0, 30),
 					}):Play()
-					for _, v in pairs(Dismiss:GetDescendants()) do
+
+					for _, v in pairs(Notification:GetDescendants()) do
 						if v:IsA("TextLabel") or v:IsA("TextButton") then
-							TweenService:Create(v, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+							TweenService:Create(v, TweenInfo.new(0.25), {TextTransparency = 1}):Play()
 						end
 					end
+
 					task.wait(0.3)
-					Dismiss:Destroy()
+					NotifUI:Destroy()
 				end
 			end)
 		end
 
-		Dismiss.Size = UDim2.new(0, 0, 0, 0)
-		TweenService:Create(Dismiss, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Size = UDim2.new(0, 262, 0, 132),
-			BackgroundTransparency = 0.3
+		TweenService:Create(Notification, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			BackgroundTransparency = 0,
+			Position = Notification.Position,
 		}):Play()
 
-		TweenService:Create(TextLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-		TweenService:Create(TextLabel_2, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-		if TextButton then
-			TweenService:Create(TextButton, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+		for _, v in pairs(Notification:GetChildren()) do
+			if v:IsA("TextLabel") or v:IsA("TextButton") then
+				v.TextTransparency = 1
+				TweenService:Create(v, TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+			end
 		end
 
 		if not Options.NeverExpire then
-			task.delay(Options.Length, function()
-				if not Dismiss or not Dismiss.Parent then return end
-				for _, v in pairs(Dismiss:GetDescendants()) do
+			task.delay(Options.Length or 5, function()
+				if not Notification or not Notification.Parent then return end
+				TweenService:Create(Notification, TweenInfo.new(0.25), {
+					BackgroundTransparency = 1,
+					Position = Notification.Position + UDim2.new(0, 0, 0, 30),
+				}):Play()
+
+				for _, v in pairs(Notification:GetDescendants()) do
 					if v:IsA("TextLabel") or v:IsA("TextButton") then
-						TweenService:Create(v, TweenInfo.new(0.3), {TextTransparency = 1}):Play()
+						TweenService:Create(v, TweenInfo.new(0.25), {TextTransparency = 1}):Play()
 					end
 				end
-				TweenService:Create(Dismiss, TweenInfo.new(0.3), {
-					BackgroundTransparency = 1,
-					Position = Dismiss.Position + UDim2.new(0.1, 0, 0, 20)
-				}):Play()
+
 				task.wait(0.3)
-				Dismiss:Destroy()
+				NotifUI:Destroy()
 			end)
 		end
 	end
