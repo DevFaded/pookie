@@ -68,7 +68,7 @@ end
             NeverExpire = false
         }
 
-        Options = DeepMerge(Options or {}, Default)
+        Options = DeepMerge(Default, Options or {})
 
         local TweenService = game:GetService("TweenService")
 
