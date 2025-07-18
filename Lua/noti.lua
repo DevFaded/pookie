@@ -29,53 +29,17 @@ return function()
     Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
     Sorter.Padding = UDim.new(0, 15)
 
-    local function DeepMerge(defaults, options)
-        local result = {}
-        for k, v in pairs(defaults) do
-            if type(v) == "table" then
-                if type(options[k]) == "table" then
-                    result[k] = DeepMerge(v, options[k])
-                else
-                    result[k] = v
-                end
-            else
-                if options[k] ~= nil then
-                    result[k] = options[k]
-                else
-                    result[k] = v
-                end
-            end
-        end
-        for k, v in pairs(options) do
-            if result[k] == nil then
-                result[k] = v
-            end
-        end
-        return result
-    end
-
     local function CreateNotification(Options)
-        -- Make sure Options is a table
         if type(Options) ~= "table" then
-            warn("CreateNotification: Options should be a table, got", type(Options))
-            Options = {}
+            warn("CreateNotification: Options should be a table")
+            return
         end
 
-        local Default = {
-            Buttons = {
-                {
-                    Title = "Dismiss",
-                    ClosesUI = true,
-                    Callback = function() end
-                }
-            },
-            Title = "Notification Title",
-            Content = "Placeholder notification content",
-            Length = 5,
-            NeverExpire = false
-        }
-
-        Options = DeepMerge(Default, Options or {})
+        local Buttons = Options.Buttons or {}
+        local Title = Options.Title or ""
+        local Content = Options.Content or ""
+        local Length = Options.Length or 5
+        local NeverExpire = Options.NeverExpire or false
 
         local Dismiss = Instance.new("Frame")
         local UICorner = Instance.new("UICorner")
@@ -98,7 +62,7 @@ return function()
         TextLabel.Position = UDim2.new(0.057, 0, 0.053, 0)
         TextLabel.Size = UDim2.new(0, 194, 0, 29)
         TextLabel.Font = Enum.Font.GothamMedium
-        TextLabel.Text = Options.Title
+        TextLabel.Text = Title
         TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         TextLabel.TextSize = 16
         TextLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -109,7 +73,7 @@ return function()
         TextLabel_2.Position = UDim2.new(0.057, 0, 0.303, 0)
         TextLabel_2.Size = UDim2.new(0, 233, 0, 52)
         TextLabel_2.Font = Enum.Font.Gotham
-        TextLabel_2.Text = Options.Content
+        TextLabel_2.Text = Content
         TextLabel_2.TextColor3 = Color3.fromRGB(234, 234, 234)
         TextLabel_2.TextSize = 14
         TextLabel_2.TextWrapped = true
@@ -119,7 +83,7 @@ return function()
 
         local buttons = {}
 
-        for i, buttonInfo in ipairs(Options.Buttons) do
+        for i, buttonInfo in ipairs(Buttons) do
             local btn = Instance.new("TextButton")
             btn.Parent = Dismiss
             btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -159,7 +123,6 @@ return function()
             table.insert(buttons, btn)
         end
 
-        -- Animate notification appearing
         Dismiss.Size = UDim2.new(0, 0, 0, 0)
         TweenService:Create(Dismiss, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 262, 0, 132),
@@ -172,8 +135,8 @@ return function()
             TweenService:Create(btn, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
         end
 
-        if not Options.NeverExpire then
-            task.delay(Options.Length, function()
+        if not NeverExpire then
+            task.delay(Length, function()
                 if not Dismiss or not Dismiss.Parent then return end
                 for _, v in pairs(Dismiss:GetDescendants()) do
                     if v:IsA("TextLabel") or v:IsA("TextButton") then
@@ -190,8 +153,7 @@ return function()
         end
     end
 
-    -- Return the notification function for use
     return {
-    CreateNotification = CreateNotification
-}
+        CreateNotification = CreateNotification
+    }
 end
