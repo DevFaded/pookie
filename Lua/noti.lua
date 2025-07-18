@@ -1,12 +1,15 @@
 return function()
-    local NotifUI = Instance.new("ScreenGui")
-    local Holder = Instance.new("ScrollingFrame")
-    local Sorter = Instance.new("UIListLayout")
+    local Players = game:GetService("Players")
+    local TweenService = game:GetService("TweenService")
+    local LocalPlayer = Players.LocalPlayer
+    local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
+    local NotifUI = Instance.new("ScreenGui")
     NotifUI.Name = "NotifUI"
-    NotifUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    NotifUI.Parent = PlayerGui
     NotifUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
+    local Holder = Instance.new("ScrollingFrame")
     Holder.Name = "Holder"
     Holder.Parent = NotifUI
     Holder.Active = true
@@ -18,6 +21,7 @@ return function()
     Holder.Size = UDim2.new(0.25, 0, 1, 0)
     Holder.CanvasSize = UDim2.new(0, 0, 0, 0)
 
+    local Sorter = Instance.new("UIListLayout")
     Sorter.Name = "Sorter"
     Sorter.Parent = Holder
     Sorter.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -25,46 +29,58 @@ return function()
     Sorter.VerticalAlignment = Enum.VerticalAlignment.Center
     Sorter.Padding = UDim.new(0, 15)
 
-    local function DeepMerge(t1, t2)
-        if type(t1) ~= "table" then
-            return t2
-        end
+    local function DeepMerge(defaults, options)
         local result = {}
-        for k, v in pairs(t2) do
+        for k, v in pairs(defaults) do
             if type(v) == "table" then
-                result[k] = DeepMerge(t1[k], v)
+                if type(options[k]) == "table" then
+                    result[k] = DeepMerge(v, options[k])
+                else
+                    result[k] = v
+                end
             else
-                result[k] = t1[k] ~= nil and t1[k] or v
+                if options[k] ~= nil then
+                    result[k] = options[k]
+                else
+                    result[k] = v
+                end
+            end
+        end
+        for k, v in pairs(options) do
+            if result[k] == nil then
+                result[k] = v
             end
         end
         return result
     end
 
     local function CreateNotification(Options)
+        -- Make sure Options is a table
+        if type(Options) ~= "table" then
+            warn("CreateNotification: Options should be a table, got", type(Options))
+            Options = {}
+        end
+
         local Default = {
             Buttons = {
-                [1] = {
-                    Title = 'Dismiss',
+                {
+                    Title = "Dismiss",
                     ClosesUI = true,
                     Callback = function() end
                 }
             },
-            Title = 'Notification Title',
-            Content = 'Placeholder notification content',
+            Title = "Notification Title",
+            Content = "Placeholder notification content",
             Length = 5,
             NeverExpire = false
         }
 
-        Options = DeepMerge(Options or {}, Default)
-
-        local TweenService = game:GetService("TweenService")
+        Options = DeepMerge(Default, Options or {})
 
         local Dismiss = Instance.new("Frame")
         local UICorner = Instance.new("UICorner")
         local TextLabel = Instance.new("TextLabel")
         local TextLabel_2 = Instance.new("TextLabel")
-        local TextButton = nil
-        local UICorner_2 = Instance.new("UICorner")
 
         Dismiss.Name = "Notification"
         Dismiss.Parent = Holder
@@ -101,26 +117,31 @@ return function()
         TextLabel_2.TextYAlignment = Enum.TextYAlignment.Top
         TextLabel_2.TextTransparency = 1
 
-        if Options.Buttons and Options.Buttons[1] then
-            TextButton = Instance.new("TextButton")
-            TextButton.Parent = Dismiss
-            TextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            TextButton.BorderSizePixel = 0
-            TextButton.Position = UDim2.new(0.057, 0, 0.697, 0)
-            TextButton.Size = UDim2.new(0, 233, 0, 29)
-            TextButton.Font = Enum.Font.GothamMedium
-            TextButton.Text = Options.Buttons[1].Title or "Dismiss"
-            TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-            TextButton.TextSize = 16
-            TextButton.TextStrokeTransparency = 1
-            TextButton.TextTransparency = 1
-            UICorner_2.CornerRadius = UDim.new(0, 6)
-            UICorner_2.Parent = TextButton
-            TextButton.MouseButton1Click:Connect(function()
-                if Options.Buttons[1].Callback then
-                    task.spawn(Options.Buttons[1].Callback)
+        local buttons = {}
+
+        for i, buttonInfo in ipairs(Options.Buttons) do
+            local btn = Instance.new("TextButton")
+            btn.Parent = Dismiss
+            btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            btn.BorderSizePixel = 0
+            btn.Size = UDim2.new(0, 233, 0, 29)
+            btn.Position = UDim2.new(0.057, 0, 0.697 + (i - 1) * 0.15, 0)
+            btn.Font = Enum.Font.GothamMedium
+            btn.Text = buttonInfo.Title or "Button"
+            btn.TextColor3 = Color3.fromRGB(0, 0, 0)
+            btn.TextSize = 16
+            btn.TextStrokeTransparency = 1
+            btn.TextTransparency = 1
+
+            local corner = Instance.new("UICorner")
+            corner.CornerRadius = UDim.new(0, 6)
+            corner.Parent = btn
+
+            btn.MouseButton1Click:Connect(function()
+                if buttonInfo.Callback then
+                    task.spawn(buttonInfo.Callback)
                 end
-                if Options.Buttons[1].ClosesUI then
+                if buttonInfo.ClosesUI then
                     TweenService:Create(Dismiss, TweenInfo.new(0.3), {
                         BackgroundTransparency = 1,
                         Position = Dismiss.Position + UDim2.new(0.1, 0, 0, 20)
@@ -134,8 +155,11 @@ return function()
                     Dismiss:Destroy()
                 end
             end)
+
+            table.insert(buttons, btn)
         end
 
+        -- Animate notification appearing
         Dismiss.Size = UDim2.new(0, 0, 0, 0)
         TweenService:Create(Dismiss, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Size = UDim2.new(0, 262, 0, 132),
@@ -144,8 +168,8 @@ return function()
 
         TweenService:Create(TextLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
         TweenService:Create(TextLabel_2, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-        if TextButton then
-            TweenService:Create(TextButton, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+        for _, btn in pairs(buttons) do
+            TweenService:Create(btn, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
         end
 
         if not Options.NeverExpire then
@@ -166,5 +190,6 @@ return function()
         end
     end
 
+    -- Return the notification function for use
     return CreateNotification
 end
