@@ -1,4 +1,6 @@
 return function()
+	local NotificationLib = {}
+
 	local NotifUI = Instance.new("ScreenGui")
 	local Holder = Instance.new("ScrollingFrame")
 	local Buttons = Instance.new("Frame")
@@ -43,7 +45,7 @@ return function()
 		return v3
 	end
 
-	local function CreateNotification(Options)
+	function NotificationLib:CreateNotification(Options)
 		local Default = {
 			Buttons = {
 				[1] = {
@@ -170,5 +172,5 @@ return function()
 		end
 	end
 
-	return CreateNotification
+	return NotificationLib
 end
